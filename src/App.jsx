@@ -1,13 +1,13 @@
 import React from 'react'
 import Home from './pages/Home'
-import { Routes, Route, Link } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import { Toaster } from "sonner";
-import Auth from './pages/Auth';
 import About from './pages/About';
 import MainLayout from './MainLayout';
 import RecipeView from './pages/RecipeView';
 import NotFound from './pages/NotFound';
 import SignUp from './pages/SignUp';
+import SignIn from './pages/SignIn';
 
 export default function App() {
   return (
@@ -21,10 +21,11 @@ export default function App() {
           <Route path="/recipe/:id" element={<RecipeView />} />
           <Route path="*" element={<NotFound />} />
           <Route path="/signup" element={<SignUp />} />
+          <Route path="/signin" element={<SignIn />} />
         </Route>
 
         {/* Routes without the header */}
-        <Route path="/auth" element={<Auth />} />
+        <Route path="/auth" element={<Navigate to="/signin" replace />} />
       </Routes>
     </div>
   )

@@ -1,6 +1,5 @@
 import { users } from '../config/mongoCollections.js';
 import bcrypt from 'bcryptjs';
-import {ObjectId} from 'mongodb';
 
 const saltRounds = 16;
 
@@ -74,4 +73,50 @@ export const createUser = async (username, password) => {
     throw err;
   }
   return {registrationCompleted: true};
+};
+
+export const verifyUser = async (username, password) => {
+  if (!username) {
+    const err = new Error('You must provide a username.');
+    err.status = 400;
+    throw err;
+  }
+  if (!password) {
+    const err = new Error('You must provide a password.');
+    err.status = 400;
+    throw err;
+  }
+
+  if (typeof username !== 'string' || typeof password !== 'string') {
+    const err = new Error('Username and password must be strings.');
+    err.status = 400;
+    throw err;
+  }
+
+  username = username.trim().toLowerCase();
+  password = password.trim();
+
+  if (!username || !password) {
+    const err = new Error('Username and password are required.');
+    err.status = 400;
+    throw err;
+  }
+
+  const userCollection = await users();
+  const user = await userCollection.findOne({ username });
+
+  if (!user) {
+    const err = new Error('Invalid username or password.');
+    err.status = 401;
+    throw err;
+  }
+
+  const passwordMatch = await bcrypt.compare(password, user.password);
+  if (!passwordMatch) {
+    const err = new Error('Invalid username or password.');
+    err.status = 401;
+    throw err;
+  }
+
+  return { authenticated: true, userId: user._id.toString(), username: user.username };
 };
